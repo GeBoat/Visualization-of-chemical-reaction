@@ -1,0 +1,35 @@
+{% extends 'head.html' %}
+{% block head %}
+<style>  .alert a {
+    text-decoration: none;
+    color: black;
+  }
+
+  .alert a:hover {
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block title %}结果图{% endblock %}
+{% block main %}
+    {% for chart in chart_list %}
+    {% if chart == 'treeall' %}
+<div class="alert alert-primary" role="alert">
+<a href="../static/result/treeall.html" target="_blank">全开树状图</a>
+</div>
+    {% elif chart == 'graph' %}
+<div class="alert alert-secondary" role="alert">
+<a href="../static/result/graph.html" target="_blank">graph图</a>
+</div>
+    {% elif chart == 'sun' %}
+<div class="alert alert-success" role="alert">
+<a href="../static/result/sun.html" target="_blank">旭日图</a>
+</div>
+    {% elif chart == 'treesome' %}
+<div class="alert alert-danger" role="alert">
+<a href="../static/result/treesome.html" target="_blank">路径树状图</a>
+</div>
+    {% endif %}
+    {% endfor %}
+{% endblock %}

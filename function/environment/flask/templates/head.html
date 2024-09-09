@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.esm.min.js"></script>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block head %}{% endblock %}
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<!--黑色顶行-->
+<nav class="navbar navbar-expand-lg navbar-light bg-blue">
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item px-4">
+                <span>欢迎来到链绘智探在线数值分析平台</span>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<style>
+    .bg-blue {
+        background-color: #2a90e5;
+    }
+    /* 为.nav-item里的文本添加左边距空白 */
+    .nav-item > span {
+        margin-left: 1em; /* 调整这个值以控制空白大小 */
+        color:white;
+    }
+</style>
+<script src="../static/js/script.js"></script>
+<!--导航条-->
+<div class="navbar-container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar-width">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-outline-primary" id="loginBtn">登录</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- 图片作为单独元素，使用绝对定位使其位于导航条上方 -->
+    <div class="logo-overlay">
+            <img src="../static/images/logo.png"  style=" width:200px; object-fit: contain; " alt="">
+    </div>
+</div>
+
+<!-- 模态框 -->
+   <!-- 登录表单 -->
+<form id="loginform" action="/mysql" method="post">
+     <div id="myModal" class="modal">
+    <div class="login-form">
+     <div class="modal-content">
+        <span class="close" id="close">&times;</span>
+            <div class="form-wrapper">
+                <h1>Log in</h1>
+                <div class="input-items">
+                        <span class="input-tips">
+                            User name：
+                        </span>
+            <input type="text" class="inputs" name="db_account" placeholder="Enter your User name">                </div>
+                <div class="input-items">
+                        <span class="input-tips">
+                            Password：
+                        </span>
+            <input type="password" class="inputs" name="db_password" placeholder="Enter password">
+                </div>
+                <div class="input-items">
+                        <span class="input-tips">
+                            Connection port：
+                        </span>
+            <input type="text" class="inputs" name="db_port" value="3306" placeholder="Enter port">
+                </div>
+                <button class="btn" id="loginForm" type="submit">Log in</button>
+            </div>
+        </div>
+    </div>
+
+   <div id="errorMessageContainer" class="d-none">
+       <div class="alert alert-danger mt-3" style="max-width: 40%;text-align: center; margin: auto" role="alert" id="errorMessage"></div>
+   </div>
+</div>
+</form>
+<br>
+
+<!-- 添加横线元素 -->
+<div class="navbar-line"></div>
+<style>
+    .custom-navbar-width {
+    background-color: transparent !important; /* 使导航条背景透明 */
+    box-shadow: none !important; /* 去除Bootstrap默认的阴影效果 */
+    width: 65%;
+    margin: 0 auto;
+  }
+  /* 添加横线样式 */
+  .navbar-line {
+    position: relative;
+    display: block;
+    height: 1px;
+    width: 100%;
+    background-color: #e8e8e8;
+    margin-top: -16px; /* 调整横线与导航条的距离，使其紧贴底部 */
+    z-index: 0; /* 确保横线位于导航条下方 */
+  }
+  .navbar-container {
+        position: relative; /* 为相对定位容器，方便内部元素绝对定位 */
+    }
+
+    .logo-overlay {
+        position: absolute;
+        left: 18%;
+        top: 0;
+        z-index: 1; /* 设置更高的z-index使其覆盖在导航条之上 */
+    }
+</style>
+<br>
+
+<!--侧导航-->
+<div class="sidebar">
+    <ul class="list-group">
+      <li class="list-group-item {% if current_page == 'index' %} active{% endif %} text-center" aria-current="true" style="display: flex; align-items: center;">文件上传</li>
+      <li class="list-group-item {% if current_page == 'chart' %} active{% endif %} text-center" style="display: flex; align-items: center;">图表选择</li>
+      <li class="list-group-item {% if current_page == 'over' %} active{% endif %} text-center" style="display: flex; align-items: center;">结果输出</li>
+    </ul>
+</div>
+<style>
+    .sidebar {
+        position: fixed;
+        left: 0;
+        width: 15%; /* 设置为页面宽度的15% */
+        height: auto;
+        overflow-y: auto;
+        padding: 20px;
+    }
+    .list-group-item.active
+    {
+        background-color: #2a90e5;
+    }
+</style>
+
+<div class="main" style="width: 65%; margin: 0 auto;">
+    {% block main %}{% endblock %}
+</div>
+<!-- 在 body 结束前添加底部 div -->
+<div class="footer-bg">
+    <div class="footer-text"> 该网站旨在化学反应数据进行计算机处理，将反应链长数据图表化，增强直观性，简化人工操作，为化学反应研究者提供便利。
+</div>
+</div>
+
+<style>  .footer-bg {
+    position: fixed; /* 更改为 fixed 定位 */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 10%; /* 按需调整高度 */
+    background-color: #2a8fe3; /* 蓝色底色 */
+    display: flex; /* 使用 Flexbox 实现内部内容居中 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+}
+
+.footer-text {
+    text-align: center; /* 保留水平居中 */
+}
+
+</style>
+</body>
+</html>

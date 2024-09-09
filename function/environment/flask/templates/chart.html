@@ -1,0 +1,150 @@
+{% extends 'head.html' %}
+{% block head %}
+    <style>  .card-container {
+        display: flex; /* 启用 Flexbox 布局 */
+        flex-wrap: wrap; /* 允许内容换行 */
+        justify-content: space-between; /* 横向排列时，卡片之间均匀分布空白 */
+
+    }
+
+    .content-area {
+        height: 70vh; /* 或者其他适合的高度 */
+        overflow-y: auto;
+    }
+
+    /* 如果希望每行的两个卡片具有相同的最大宽度，可以根据需要设置下面的规则 */
+    .card {
+        max-width: calc(50% - 1rem); /* 计算每个卡片的最大宽度，留出一些间隔 */
+        margin-bottom: 1rem; /* 每个卡片下方增加一定间距 */
+    }
+
+    .content-area::-webkit-scrollbar {
+        /* 隐藏滚动条 */
+        display: none;
+    }
+    </style>
+{% endblock %}
+
+{% block title %}选图{% endblock %}
+{% block main %}
+    <div class="content-area">
+        <div class="card-container">
+            <div class="card">
+                <img src="../static/images/tree.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">树状图</h5>
+                    <p class="card-text">树形图是数据树的图形表示形式，以父子层次结构来组织对象。</p>
+                    <div class="card-checkbox">
+                        <input type="checkbox" id="treeall">
+                        <label for="tree">全开树图</label>
+                    </div>
+                    <div class="card-checkbox">
+                        <input type="checkbox" id="treesome">
+                        <label for="tree">路径树图</label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card">
+                <img src="../static/images/graph.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">Graph图</h5>
+                    <p class="card-text">图(Graph)是一种数据结构，用于表示对象之间的关系。图由节点和边组成，节点表示对象，边表示对象之间的关系。
+                    <div class="card-checkbox">
+                        <input type="checkbox" id="graph">
+                        <label for="graph"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" aria-hidden="true">
+                <img src="../static/images/sun.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">旭日图</h5>
+                    <p class="card-text">
+                        旭日图中每个级别的数据通过一个圆环表示，离原点越近代表圆环级别越高，面积代表占比。越往外，级别越低，且分类越细</p>
+                    <div class="card-checkbox">
+                        <input type="checkbox" id="sun">
+                        <label for="sun"></label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card" style="height: 200px; width: 500px;border-color: transparent ">
+                <button id="submitBtn" class="btn btn-primary btn-lg">提交</button>
+                <div id="newButtonContainer" class="btn btn-primary btn-lg" style="display: none;"></div>
+                <div id="progressBar" class="progress mt-3" style="display: none;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                         style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+        </div>
+        <!-- 新增用于替换的按钮容器 -->
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const submitBtn = document.getElementById("submitBtn");
+            const progressBar = document.getElementById("progressBar");
+            const newButtonContainer = document.getElementById("newButtonContainer");
+            const checkboxes = document.querySelectorAll(".card-checkbox input[type='checkbox']");
+
+            // 当点击提交按钮时，发送选中的多选框数据到后端
+            submitBtn.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const selectedIds = Array.from(checkboxes)
+                    .filter((checkbox) => checkbox.checked)
+                    .map((checkbox) => checkbox.id);
+
+                // 显示进度条，禁用提交按钮
+                progressBar.style.display = "block";
+                submitBtn.disabled = true;
+
+                // 发送 POST 请求到后端接口
+                fetch("/chart", { // 替换为实际的后端接口 URL
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({selectedIds}), // 将选中的多选框 ID 数组作为请求体发送
+                })
+                    .then(response => {
+                        if (response.ok) { // 处理 HTTP 状态码为 200 的成功响应
+                            return response.json();
+                        } else {
+                            throw new Error('Failed to send request.');
+                        }
+                    })
+                    .then(() => {
+                        // 隐藏进度条，恢复按钮状态
+                        progressBar.style.display = "none";
+                        submitBtn.disabled = false;
+
+                        // 隐藏提交按钮
+                        submitBtn.style.display = "none";
+
+                        // 创建新按钮并添加点击事件
+                        const nextBtn = document.createElement('button');
+                        nextBtn.className = "btn btn-primary btn-lg";
+                        nextBtn.textContent = "下一步";
+                        nextBtn.addEventListener('click', () => {
+                            window.location.href = "/over"; // 跳转至 over.html 页面
+                        });
+
+                        // 清空并添加新按钮到指定容器
+                        newButtonContainer.innerHTML = '';
+                        newButtonContainer.appendChild(nextBtn);
+                        newButtonContainer.style.display = "block";
+                    })
+                    .catch(error => {
+                        console.error('An error occurred:', error);
+                        // 在这里添加错误处理逻辑，如提示用户操作失败等
+                    });
+            });
+        });
+    </script>
+
+{% endblock %}

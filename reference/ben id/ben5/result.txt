@@ -1,0 +1,18 @@
+=================================================================================
+split file:    split_file_1.txt
+temperature:   bonds1
+atom id:       907 908 909 910 911 912<>   
+static final:  C6H6           <>   
+
+=================================================================================
+split file:    split_file_8074.txt
+temperature:   bonds1
+atom id:       907 908 909 910 911 912<>   
+static final:  C6H6O1         <>   
+
+=================================================================================
+split file:    split_file_8075.txt
+temperature:   bonds1
+atom id:       907 908 909 910 911 912<>   
+static final:  C6H6           <>   
+

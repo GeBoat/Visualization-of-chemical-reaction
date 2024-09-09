@@ -1,0 +1,12 @@
+..\..\..\Scripts\xmysql-script.py
+..\..\..\Scripts\xmysql.exe
+..\pymysql2\__init__.py
+..\pymysql2\__main__.py
+..\pymysql2\__pycache__\__init__.cpython-38.pyc
+..\pymysql2\__pycache__\__main__.cpython-38.pyc
+PKG-INFO
+SOURCES.txt
+dependency_links.txt
+entry_points.txt
+requires.txt
+top_level.txt

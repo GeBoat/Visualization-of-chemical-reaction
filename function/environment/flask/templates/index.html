@@ -1,0 +1,203 @@
+{% extends 'head.html' %}
+{% block head %}
+    <style>        .btn.btn-primary {
+        background-color: #cde0fd;
+    }
+
+    .btn.btn-primary:hover {
+        background-color: #2a8fe3;
+    }
+
+    .selected-file {
+        text-align: left;
+        font-weight: bold;
+        width: 90%;
+        height: auto;
+        background-color: white;
+        overflow-y: auto; /* 添加这一行 */
+        max-height: 120px; /* 添加这一行，根据需要调整高度值 */
+    }
+
+    .btn-confirm-upload {
+        background-color: #2a8fe3;
+        color: white;
+        padding: 0.5rem 1rem;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        outline: none;
+    }
+
+    .btn-confirm-upload:hover {
+        background-color: #1b71bb;
+    }
+    </style>
+{% endblock %}
+{% block title %}数据可视化平台{% endblock %}
+{% block main %}
+    <h1 style="text-align: center; color: #0a53be;">文件上传</h1>
+    <h4 style="text-align: center; font-weight: lighter;">请上传需要处理的文件</h4>
+
+    <!-- 文件上传区域 -->
+    <div style="background-color: #dff5c9; min-height: 200px; width: 100%; display: flex; justify-content: center; align-items: center; position: relative">
+        <!-- 新增：将显示文件名的div移至背景div内部，并设置样式使其位于顶部 -->
+        <div id="selectedFileName" class="selected-file" style="display: none; margin-bottom: 1rem;"></div>
+
+        <div class="btn-group" role="group" aria-label="Basic example" style="display: flex; align-items: center;">
+            <!-- 使用label包裹input[type=file]以模拟按钮样式 -->
+            <label class="btn btn-primary" for="uploadFile"
+                   style="display: flex; align-items: center; position: relative; width: 200px; height: 50px;">
+
+                <input id="uploadFile" type="file" webkitdirectory mozdirectory msdirectory directory
+                       style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer;"
+                       onchange="onFileSelected(event)">
+
+                <!-- 放置文字 -->
+                <span style="color: #0a52bc; margin-left: 0.5rem;">选择文件</span>
+
+                <!-- 在按钮旁边添加图片，这里使用span包裹img标签，并添加margin控制间距 -->
+                <span style="margin-left: 4.5rem;">
+                    <img src="../static/images/file.png" alt="文件图标" style="max-height: 20px;">
+                </span>
+            </label>
+        </div>
+
+        <div id="confirmUploadBtn" style="display: none; bottom: 0; right: 0; position: absolute;">
+            <button class="btn-confirm-upload">确认上传</button>
+        </div>
+        <div id="reuploadBtn" style="display: none; bottom: 0; left: 0; position: absolute;">
+            <button class="btn-confirm-upload" onclick="document.getElementById('reuploadFile').click()">重新上传
+            </button>
+        </div>    <!-- 新增进度条容器 -->
+
+    </div>
+    <div class="progress-container">
+        <div class="progress" role="progressbar" aria-label="Info striped example" aria-valuenow="50" aria-valuemin="0"
+             aria-valuemax="100">
+            <div id="progressBar" class="progress-bar progress-bar-striped bg-info" style="width: 0"></div>
+        </div>
+    </div>
+
+
+    <input id="reuploadFile" type="file" webkitdirectory mozdirectory msdirectory directory style="display: none;"
+           onchange="onFileSelected(event)">
+
+
+    <script>
+        let uploadFinished = false;
+
+        function onFileSelected(event) {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+
+            if (!loggedInUser) {
+                // 用户未登录，弹出警告框提示
+                showLoginWarning();
+                return;
+            }
+
+
+            const fileList = event.target.files;
+
+            // 清空之前的选择记录
+            document.getElementById('selectedFileName').innerHTML = '';
+
+            // 遍历所有选中的文件，将文件名添加到页面上
+            for (const file of fileList) {
+                const fileNameDiv = document.createElement('div');
+                fileNameDiv.classList.add('file-name-item');
+                fileNameDiv.innerText = file.name;
+
+                document.getElementById('selectedFileName').appendChild(fileNameDiv);
+            }
+
+            // 显示已选文件名区域
+            document.getElementById('selectedFileName').style.display = 'block';
+
+            // 新增：隐藏“选择文件”按钮
+            const selectFileButton = document.querySelector('.btn.btn-primary');
+            selectFileButton.style.display = 'none';
+            const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+            confirmUploadBtn.style.display = 'block';
+            document.getElementById('reuploadBtn').style.display = 'block';
+
+            // 新增：清空进度条进度
+            document.getElementById('progressBar').style.width = '0%'; // 将进度条宽度重置为0%
+        }
+
+        function showLoginWarning() {
+            alert('请先登录再使用');
+        }
+
+        setInterval(function () {
+            if (uploadFinished) {
+                // 文件上传已完成，执行界面更新逻辑
+
+                // 隐藏进度条和重新选择按钮
+                document.querySelector('.progress-container').style.display = 'none';
+                document.getElementById('reuploadBtn').style.display = 'none';
+
+                // 修改确认上传按钮为“下一步”按钮，并添加点击事件处理器
+                const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+                const btnElement = confirmUploadBtn.querySelector('button');
+                btnElement.innerText = '下一步';
+                btnElement.onclick = function () {
+                    window.location.href = "/chart";
+                };
+
+                // 停止当前定时器
+                clearInterval(this);
+            }
+        }, 500);
+
+        function uploadFile() {
+            var files = document.getElementById('uploadFile').files;
+            var formData = new FormData();
+            for (var i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            $.ajax({
+                url: '/open_file',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function (e) {
+                            if (e.lengthComputable) {
+                                var percentComplete = (e.loaded / e.total) * 100;
+                                console.log(percentComplete.toFixed(2) + '%');
+
+                                // 更新进度条宽度以显示上传进度
+                                document.getElementById('progressBar').style.width = `${percentComplete}%`;
+                            }
+                        }, false);
+                    }
+                    return myXhr;
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        uploadFinished = true;
+                        alert('文件上传成功');
+                        // 可在此处添加成功后的页面操作，如跳转、更新UI等
+                    } else {
+                        alert('文件上传失败，请重试');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    uploadFinished = true;
+                    alert('文件上传过程中发生错误: ' + errorThrown);
+                }
+            });
+        }
+
+
+        // 绑定 input[type=file] 的 onchange 事件
+        document.getElementById('uploadFile').addEventListener('change', onFileSelected);
+
+        // 正确的事件绑定位置，只绑定一次即可
+        document.getElementById('confirmUploadBtn').addEventListener('click', uploadFile);
+    </script>
+{% endblock %}

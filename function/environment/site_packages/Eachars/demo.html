@@ -1,0 +1,127 @@
+<!--
+    THIS EXAMPLE WAS DOWNLOADED FROM https://echarts.apache.org/examples/zh/editor.html?c=treemap-drill-down
+-->
+<!DOCTYPE html>
+<html style="height: 100%">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="height: 100%; margin: 0">
+        <div id="container" style="height: 100%"></div>
+
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<!--        <script type="text/javascript" src="jquery-3.6.0.min.js"></script>-->
+        <script type="text/javascript" src="area.js"></script>
+        <script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+
+var option;
+
+
+var ROOT_PATH = 'https://cdn.jsdelivr.net/gh/apache/echarts-website@asf-site/examples';
+//
+var uploadedDataURL = ROOT_PATH + '/data/asset/data/ec-option-doc-statistics-201604.json';
+var uploadedDataURL="result.json";
+myChart.showLoading();
+
+
+    myChart.hideLoading();
+
+    function convert(source, target, basePath) {
+        for (var key in source) {
+            console.log(key)
+            var path = basePath ? (basePath + '->' + key) : key;
+            if (!key.match(/^\$/)) {
+                target.children = target.children || [];
+                var child = {
+                    name: path
+                };
+                target.children.push(child);
+                convert(source[key], child, path);
+            }
+            else{
+            }
+        }
+
+        if (!target.children) {
+            target.value = source.$count || 1;
+        }
+        else {
+            target.children.push({
+                name: basePath,
+                value: source.$count
+            });
+        }
+    }
+
+    var data = [];
+
+    convert(rawData, data, '');
+
+    myChart.setOption(option = {
+        title: {
+            text: '反应面积效率图',
+            left: 'center'
+        },
+        tooltip: {},
+        series: [{
+            name: 'main',
+            type: 'treemap',
+
+            visibleMin: 300,
+            data: data.children,
+            leafDepth: 2,
+            levels: [
+                {
+                    itemStyle: {
+                        borderColor: '#555',
+                        borderWidth: 4,
+                        gapWidth: 4
+                    }
+                },
+                {
+                    colorSaturation: [0.3, 0.6],
+                    itemStyle: {
+                        borderColorSaturation: 0.7,
+                        gapWidth: 2,
+                        borderWidth: 2
+                    }
+                },
+                {
+                    colorSaturation: [0.3, 0.55],
+                    itemStyle: {
+                        borderColorSaturation: 0.6,
+                        gapWidth: 1
+                    }
+                },
+                {
+                    colorSaturation: [0.3, 0.5],
+                    itemStyle: {
+                        borderColorSaturation: 0.6,
+                        gapWidth: 1
+                    }
+                },
+                {
+                    colorSaturation: [0.3, 0.45],
+                    itemStyle: {
+                        borderColorSaturation: 0.6,
+                        gapWidth: 1
+                    }
+                },
+                {
+                    colorSaturation: [0.3, 0.40]
+                }
+            ]
+        }]
+    });
+
+if (option && typeof option === 'object') {
+    // myChart.setOption(option);
+}
+
+        </script>
+    </body>
+</html>
+    
